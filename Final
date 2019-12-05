@@ -1,39 +1,55 @@
 pipeline {
-    //agent none
-	agent any
+    agent any 
+	triggers {
+        //Cuando haya cambios en el repo
+        pollSCM('* * * * 1-5') 
+		}
+	tools {
+        maven 'LocalMaven' 
+        jdk 'LocalJDK8'
+    }
     stages {
-	
-	stage('Non-Parallel Stage') {
-	    /*agent {
-                        label "master"
-                }*/
-        steps {
-                echo 'This stage will be executed first'
-                }
+        stage('NODO PRINCIPAL_job1') {
+            //COMO NO LE PONGO AGENT SE EJECUTARA EN EL PPAL.
+            steps {
+			//Descarga codigo git
+                git 'https://github.com/susmarmar/Spring3MVC.git'
+			//mvn clean test
+				bat 'mvn clean test'
+			
+			//Ejecutar job2 si test ok
+			post { 
+					success { 
+							//Ejecutar job2
+							
+					}			
+        
+				}
+           
+            }
         }
-
-	
-        stage('Run Tests') {
-            parallel {
-                stage('Test On Windows') {
-                   /*agent {
-                        label "mock"
-                    }*/
-                    steps {
-			sleep 10
-                        echo "Task1 on Parallel"
-                    }
-                    
-                }
-                stage('Test On Master') {
-                    /*agent {
-                        label "win"
-                    }*/
-                    steps {
-			    	sleep 10
-				echo "Task2 on Parallel"
-			}
-                }
+        stage('NODO PRINCIPAL_job2') {
+            
+            steps {
+             bat 'mvn clean package'   
+	     //Guardar los archivos generados
+	     archiveArtifacts '**/*.war' 
+               
+            }
+        }
+        stage('NODO ESCLAVO MOCK_job3') {
+            agent { label 'real' } 
+            steps {
+                //Sonar con maven 
+		mvn sonar:sonar -Dsonar.host.url=http://localhost:9000 -Dsonar.login=admin -Dsonar.password=admin -Dsonar.projectName=SpringSonarMVC    
+            }
+        }
+		
+	stage('NODO ESCLAVO REAL_job4') {
+            agent { label 'real' } 
+            steps {
+                copyArtifacts filter: '**/*.war', fingerprintArtifacts: true, projectName: 'Ejercicio final', selector: specific('${BUILD_NUMBER}')
+                deploy adapters: [tomcat8(credentialsId: '53ee8c9b-3c9e-450c-b5d1-4ebb9f5cae20', path: '', url: 'http://localhost:8081')], contextPath: null, war: '**/*.war'
             }
         }
     }
