@@ -38,11 +38,11 @@ pipeline {
             }
         }
         stage('NODO ESCLAVO MOCK_job3') {
-            agent { label 'real' } 
+            agent { label 'mock' } 
             steps {
                 //Sonar con maven 
-		//bat 'mvn sonar:sonar -Dsonar.host.url=http://localhost:9000 -Dsonar.login=admin -Dsonar.password=admin -Dsonar.projectName=SpringSonarMVC'   
-		echo '3'
+		bat 'mvn sonar:sonar -Dsonar.host.url=http://localhost:9000 -Dsonar.login=admin -Dsonar.password=admin -Dsonar.projectName=SpringSonarMVC'   
+		
             }
         }
 		
