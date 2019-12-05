@@ -18,13 +18,13 @@ pipeline {
 				bat 'mvn clean test'
 			
 			//Ejecutar job2 si test ok
-			post { 
-					success { 
+			//post { 
+					//success { 
 							//Ejecutar job2
 							
-					}			
+					//}			
         
-				}
+				//}
            
             }
         }
