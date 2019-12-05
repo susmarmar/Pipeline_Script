@@ -41,7 +41,7 @@ pipeline {
             agent { label 'real' } 
             steps {
                 //Sonar con maven 
-		bat 'mvn sonar:sonar -Dsonar.host.url=http://localhost:9000 -Dsonar.login=admin -Dsonar.password=admin -Dsonar.projectName=SpringSonarMVC'   
+		//bat 'mvn sonar:sonar -Dsonar.host.url=http://localhost:9000 -Dsonar.login=admin -Dsonar.password=admin -Dsonar.projectName=SpringSonarMVC'   
             }
         }
 		
